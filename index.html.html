@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>MEMMAC BEAUTY — Calculadora de Precios</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+/* ── RESET & TOKENS ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+ --blush:  #FFD6E0;
+ --petal:  #FFACC7;
+ --rose: #FF5C8D;
+ --deep-rose: #D6336C;
+ --cream:  #FFF5F8;
+ --white:  #FFFFFF;
+ --text: #3D1A2B;
+ --muted:  #9E6678;
+ --border: #FFCAD9;
+ --radius-card: 22px;
+ --radius-pill: 50px;
+ --shadow-card: 0 4px 32px rgba(214,51,108,.07);
+ --shadow-btn: 0 4px 18px rgba(255,92,141,.38);
+}
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+ background: linear-gradient(148deg, #FFF0F5 0%, #FFE6EF 45%, #FFF5F8 100%);
+ font-family: 'DM Sans', sans-serif;
+ color: var(--text);
+ min-height: 100vh;
+ padding: 0 0 100px;
+ -webkit-font-smoothing: antialiased;
+}
+
+body::before {
+ content: '';
+ position: fixed; inset: 0; z-index: 0; pointer-events: none;
+ background:
+ radial-gradient(ellipse at 12% 18%, rgba(255,92,141,.09) 0%, transparent 42%),
+ radial-gradient(ellipse at 88% 78%, rgba(255,172,199,.13) 0%, transparent 42%);
+}
+
+.wrap { max-width: 760px; margin: 0 auto; padding: 0 16px; position: relative; z-index: 1; }
+
+/* ── HEADER ─────────────────────────────────────────────────── */
+header { text-align: center; padding: 44px 20px 28px; }
+
+.brand-bow { font-size: 32px; margin-bottom: 6px; display: block; animation: float 3s ease-in-out infinite; }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+
+header h1 {
+ font-family: 'Cormorant Garamond', serif;
+ font-size: clamp(2.1rem, 7vw, 3.6rem);
+ font-weight: 300;
+ letter-spacing: .13em;
+ color: var(--text);
+ line-height: 1.05;
+}
+header h1 span { color: var(--rose); font-style: italic; }
+
+.tagline {
+ font-size: .75rem;
+ color: var(--muted);
+ letter-spacing: .22em;
+ text-transform: uppercase;
+ margin-top: 10px;
+}
+
+.divider-bow {
+ display: flex; align-items: center; gap: 14px;
+ margin: 18px auto 0; max-width: 280px;
+}
+.divider-bow::before, .divider-bow::after {
+ content: ''; flex: 1; height: 1px;
+ background: linear-gradient(to right, transparent, var(--petal), transparent);
+}
+.divider-bow span { font-size: 16px; color: var(--petal); }
+
+/* ── TABS ────────────────────────────────────────────────────── */
+.tabs-wrap {
+ position: sticky; top: 0; z-index: 40;
+ background: rgba(255,240,245,.92);
+ backdrop-filter: saturate(180%) blur(14px);
+ -webkit-backdrop-filter: saturate(180%) blur(14px);
+ padding: 12px 16px;
+ border-bottom: 1px solid var(--border);
+}
+
+.tabs {
+ display: flex; gap: 8px;
+ overflow-x: auto; -webkit-overflow-scrolling: touch;
+ scroll-snap-type: x mandatory;
+ padding-bottom: 2px;
+ scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+
+.tab-btn {
+ flex-shrink: 0;
+ scroll-snap-align: start;
+ background: var(--white);
+ border: 1.5px solid var(--border);
+ border-radius: var(--radius-pill);
+ padding: 10px 18px;
+ font-family: 'DM Sans', sans-serif;
+ font-size: .82rem;
+ font-weight: 500;
+ letter-spacing: .04em;
+ color: var(--muted);
+ cursor: pointer;
+ transition: all .22s;
+ white-space: nowrap;
+ -webkit-tap-highlight-color: transparent;
+ min-height: 42px;
+}
+.tab-btn:hover { border-color: var(--rose); color: var(--rose); }
+.tab-btn.active {
+ background: linear-gradient(135deg, var(--rose), var(--deep-rose));
+ border-color: transparent;
+ color: #fff;
+ box-shadow: var(--shadow-btn);
+}
+
+/* ── CONTENT AREA ────────────────────────────────────────────── */
+.content { padding-top: 24px; }
+
+.section { display: none; }
+.section.active { display: block; }
+
+/* ── CARD ────────────────────────────────────────────────────── */
+.card {
+ background: rgba(255,255,255,.88);
+ backdrop-filter: blur(10px);
+ -webkit-backdrop-filter: blur(10px);
+ border: 1px solid var(--border);
+ border-radius: var(--radius-card);
+ padding: 28px 22px;
+ margin-bottom: 14px;
+ box-shadow: var(--shadow-card);
+}
+
+.card-title {
+ font-family: 'Cormorant Garamond', serif;
+ font-size: 1.45rem;
+ font-weight: 400;
+ color: var(--deep-rose);
+ margin-bottom: 6px;
+}
+.card-desc {
+ font-size: .83rem;
+ color: var(--muted);
+ line-height: 1.65;
+ margin-bottom: 18px;
+}
+
+/* ── SECTION LABEL ───────────────────────────────────────────── */
+.slabel {
+ font-size: .7rem;
+ font-weight: 500;
+ letter-spacing: .18em;
+ text-transform: uppercase;
+ color: var(--rose);
+ margin: 20px 0 10px;
+}
+.slabel:first-child { margin-top: 0; }
+
+/* ── INCLUDES BOX ────────────────────────────────────────────── */
+.includes {
+ background: linear-gradient(135deg, #FFF2F8, #FFE9F3);
+ border-radius: 14px;
+ padding: 14px 18px;
+ margin-bottom: 4px;
+ border: 1px solid var(--border);
+}
+.includes li {
+ font-size: .82rem; color: var(--muted);
+ list-style: none; padding-left: 18px;
+ position: relative; margin: 5px 0;
+ line-height: 1.5;
+}
+.includes li::before {
+ content: '✦'; position: absolute; left: 0;
+ color: var(--rose); font-size: .58rem; top: 4px;
+}
+
+/* ── BASE PRICE BADGE ────────────────────────────────────────── */
+.base-price {
+ display: inline-flex; align-items: baseline; gap: 4px;
+ margin: 14px 0 4px;
+}
+.base-price-num {
+ font-family: 'Cormorant Garamond', serif;
+ font-size: 2.2rem; color: var(--rose); font-weight: 300;
+}
+.base-price-cur { font-size: .85rem; color: var(--muted); }
+
+/* ── OPTION GRID (radios) ────────────────────────────────────── */
+.option-grid {
+ display: grid;
+ grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+ gap: 9px; margin-bottom: 4px;
+}
+.opt-radio { display: none; }
+.opt-label {
+ display: block;
+ border: 1.5px solid var(--border);
+ border-radius: 14px;
+ padding: 13px 14px;
+ cursor: pointer;
+ transition: all .2s;
+ background: var(--white);
+ -webkit-tap-highlight-color: transparent;
+}
+.opt-label:hover { border-color: var(--petal); }
+.opt-radio:checked + .opt-label {
+ border-color: var(--rose);
+ background: linear-gradient(135deg, #FFF2F8, #FFE0EE);
+ box-shadow: 0 2px 14px rgba(255,92,141,.18);
+}
+.opt-name { font-size: .87rem; font-weight: 500; display: block; margin-bottom: 3px; }
+.opt-price { font-size: .77rem; color: var(--rose); font-weight: 500; }
+.opt-note { font-size: .7rem; color: var(--muted); display: block; margin-top: 2px; }
+
+/* ── DECO TABLE ──────────────────────────────────────────────── */
+.deco-table {
+ border: 1px solid var(--border);
+ border-radius: 16px;
+ overflow: hidden;
+ margin-bottom: 4px;
+}
+.deco-thead {
+ display: grid; grid-template-columns: 1fr auto;
+ background: linear-gradient(135deg, var(--rose), var(--deep-rose));
+}
+.deco-th {
+ padding: 10px 14px;
+ font-size: .7rem; letter-spacing: .1em;
+ text-transform: uppercase; color: #fff; font-weight: 500;
+}
+.deco-th:last-child { text-align: right; }
+
+.deco-body { display: grid; grid-template-columns: 1fr auto; }
+
+.deco-cell {
+ padding: 10px 14px;
+ font-size: .84rem;
+ display: flex; align-items: center;
+ border-top: 1px solid var(--border);
+ background: var(--white);
+}
+.deco-cell.right {
+ justify-content: flex-end; gap: 10px;
+ background: var(--white);
+}
+.deco-body > .deco-cell:nth-child(4n+1),
+.deco-body > .deco-cell:nth-child(4n+2) { background: #FFF8FB; }
+
+.dprice { color: var(--rose); font-size: .76rem; min-width: 28px; text-align: right; font-weight: 500; }
+
+/* ── NAIL COUNTER ────────────────────────────────────────────── */
+.nctr { display: flex; align-items: center; gap: 2px; }
+.nbtn {
+ width: 32px; height: 32px; border-radius: 50%;
+ border: 1.5px solid var(--border);
+ background: var(--white);
+ color: var(--rose);
+ font-size: 16px; line-height: 1;
+ cursor: pointer;
+ transition: all .15s;
+ display: flex; align-items: center; justify-content: center;
+ flex-shrink: 0;
+ -webkit-tap-highlight-color: transparent;
+ touch-action: manipulation;
+}
+.nbtn:hover, .nbtn:active { background: var(--rose); color: #fff; border-color: var(--rose); }
+.ncount {
+ width: 30px; text-align: center;
+ font-size: .85rem; font-weight: 500; color: var(--text);
+}
+
+/* ── TOGGLE SWITCH ───────────────────────────────────────────── */
+.extra-row {
+ display: flex; align-items: center; justify-content: space-between;
+ padding: 12px 0; border-bottom: 1px dashed var(--border);
+ gap: 12px;
+}
+.extra-row:last-child { border-bottom: none; }
+.extra-info { font-size: .87rem; line-height: 1.3; }
+.extra-price-tag { font-size: .77rem; color: var(--muted); margin-top: 2px; }
+
+.tog-check { display: none; }
+.tog-label {
+ width: 46px; height: 26px; background: var(--border);
+ border-radius: 13px; cursor: pointer; position: relative;
+ transition: background .2s; flex-shrink: 0;
+ -webkit-tap-highlight-color: transparent;
+}
+.tog-label::after {
+ content: ''; position: absolute;
+ top: 3px; left: 3px; width: 20px; height: 20px;
+ border-radius: 50%; background: #fff;
+ transition: left .2s; box-shadow: 0 1px 4px rgba(0,0,0,.18);
+}
+.tog-check:checked + .tog-label { background: var(--rose); }
+.tog-check:checked + .tog-label::after { left: 23px; }
+
+/* ── EVENT CARDS ─────────────────────────────────────────────── */
+.event-cards {
+ display: grid; grid-template-columns: 1fr 1fr;
+ gap: 12px; margin-bottom: 4px;
+}
+@media (max-width: 480px) { .event-cards { grid-template-columns: 1fr; } }
+
+.ev-card {
+ border: 2px solid var(--border); border-radius: 18px;
+ padding: 18px 16px; cursor: pointer; transition: all .2s;
+ background: var(--white); position: relative; overflow: hidden;
+ -webkit-tap-highlight-color: transparent;
+}
+.ev-card::after {
+ content: ''; position: absolute; top: -24px; right: -16px;
+ width: 70px; height: 70px; border-radius: 50%;
+ background: rgba(255,172,199,.15);
+}
+.ev-card.selected {
+ border-color: var(--rose);
+ background: linear-gradient(135deg, #FFF2F8, #FFE0EE);
+ box-shadow: 0 4px 22px rgba(255,92,141,.22);
+}
+.ev-badge {
+ position: absolute; top: 11px; right: 11px;
+ background: var(--rose); color: #fff;
+ font-size: .62rem; border-radius: 50px; padding: 2px 9px;
+ letter-spacing: .06em; text-transform: uppercase;
+}
+.ev-name { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; color: var(--deep-rose); margin-bottom: 4px; }
+.ev-dur { font-size: .73rem; color: var(--muted); margin-bottom: 10px; }
+.ev-price { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--rose); font-weight: 300; }
+.ev-regular { font-size: .73rem; color: var(--muted); }
+.ev-regular s { color: #c9a0ae; }
+
+/* ── PRICE MODE ──────────────────────────────────────────────── */
+.price-mode { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+.pm-btn {
+ flex: 1; min-width: 130px;
+ padding: 11px 14px; border-radius: 13px;
+ border: 1.5px solid var(--border);
+ background: var(--white); cursor: pointer;
+ font-size: .82rem; color: var(--muted);
+ transition: all .2s; text-align: center;
+ font-family: 'DM Sans', sans-serif;
+ -webkit-tap-highlight-color: transparent;
+ touch-action: manipulation;
+}
+.pm-btn:hover { border-color: var(--rose); }
+.pm-btn.active { background: var(--rose); border-color: var(--rose); color: #fff; box-shadow: var(--shadow-btn); }
+
+/* ── HORA COUNTER ────────────────────────────────────────────── */
+.hora-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px dashed var(--border); flex-wrap: wrap; }
+.hora-row input[type=number] {
+ width: 68px; padding: 9px 10px;
+ border: 1.5px solid var(--border); border-radius: 10px;
+ font-size: .9rem; color: var(--text);
+ font-family: 'DM Sans', sans-serif;
+ background: var(--white);
+}
+.hora-row input[type=number]:focus { outline: none; border-color: var(--rose); }
+.hora-label { font-size: .83rem; color: var(--muted); flex: 1; }
+
+/* ── INFO NOTE ───────────────────────────────────────────────── */
+.info-note {
+ font-size: .76rem; color: var(--muted);
+ line-height: 1.6; padding: 12px 14px;
+ background: #FFF8FB; border-radius: 10px;
+ border: 1px solid var(--border); margin-top: 12px;
+}
+
+/* ── HAIR SECTION ────────────────────────────────────────────── */
+.hair-visual {
+ display: grid; grid-template-columns: repeat(auto-fill, minmax(148px,1fr));
+ gap: 10px; margin-bottom: 4px;
+}
+.hair-card {
+ border: 1.5px solid var(--border); border-radius: 14px;
+ padding: 14px 12px; cursor: pointer;
+ transition: all .2s; background: var(--white);
+ -webkit-tap-highlight-color: transparent;
+}
+.hair-card.selected {
+ border-color: var(--rose);
+ background: linear-gradient(135deg, #FFF2F8, #FFE0EE);
+ box-shadow: 0 2px 12px rgba(255,92,141,.18);
+}
+.hair-card-icon { font-size: 1.4rem; margin-bottom: 4px; display: block; }
+.hair-card-name { font-size: .86rem; font-weight: 500; display: block; margin-bottom: 2px; }
+.hair-card-desc { font-size: .72rem; color: var(--muted); display: block; line-height: 1.4; }
+
+.cantidad-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.cant-radio { display: none; }
+.cant-label {
+ display: flex; flex-direction: column;
+ align-items: center; justify-content: center;
+ border: 1.5px solid var(--border); border-radius: 13px;
+ padding: 14px 10px; cursor: pointer;
+ transition: all .2s; background: var(--white); text-align: center;
+ -webkit-tap-highlight-color: transparent;
+}
+.cant-label:hover { border-color: var(--petal); }
+.cant-radio:checked + .cant-label {
+ border-color: var(--rose);
+ background: linear-gradient(135deg, #FFF2F8, #FFE0EE);
+}
+.cant-icon { font-size: 1.4rem; margin-bottom: 4px; }
+.cant-name { font-size: .86rem; font-weight: 500; }
+.cant-desc { font-size: .72rem; color: var(--muted); margin-top: 2px; }
+.cant-price { font-size: .78rem; color: var(--rose); font-weight: 500; margin-top: 4px; }
+
+.no-price-note {
+ text-align: center; padding: 18px;
+ font-size: .84rem; color: var(--muted);
+ font-style: italic;
+ background: linear-gradient(135deg, #FFF2F8, #FFE9F3);
+ border-radius: 14px; border: 1px dashed var(--border); margin-top: 6px;
+}
+
+/* ── TOTAL CARD ──────────────────────────────────────────────── */
+.total-card {
+ background: linear-gradient(138deg, #FF6B9E, var(--deep-rose) 90%);
+ border-radius: 22px;
+ padding: 26px 22px 20px;
+ color: #fff;
+ box-shadow: 0 10px 48px rgba(214,51,108,.32);
+ margin-top: 6px;
+}
+.total-top-label {
+ font-size: .68rem; letter-spacing: .22em;
+ text-transform: uppercase; opacity: .78; margin-bottom: 3px;
+}
+.total-service-name {
+ font-family: 'Cormorant Garamond', serif;
+ font-size: 1.1rem; font-weight: 300; opacity: .92; margin-bottom: 14px;
+}
+.total-lines { margin-bottom: 10px; }
+.tline {
+ display: flex; justify-content: space-between;
+ font-size: .82rem; opacity: .85; padding: 3px 0;
+}
+.tdivider { height: 1px; background: rgba(255,255,255,.28); margin: 10px 0; }
+
+.total-amount { display: flex; justify-content: space-between; align-items: flex-end; }
+.total-left .ttext { font-size: .83rem; opacity: .78; }
+.total-left .tcur { font-size: .72rem; opacity: .65; margin-top: 2px; }
+.total-num {
+ font-family: 'Cormorant Garamond', serif;
+ font-size: 3rem; font-weight: 300; line-height: 1;
+}
+
+.cotiza-badge {
+ background: rgba(255,255,255,.18);
+ border: 1px solid rgba(255,255,255,.3);
+ border-radius: 12px; padding: 10px 14px;
+ font-size: .82rem; margin-top: 12px;
+}
+
+/* ── WHATSAPP BUTTON ─────────────────────────────────────────── */
+.wa-btn {
+ display: flex; align-items: center; justify-content: center; gap: 10px;
+ width: 100%; margin-top: 14px;
+ background: rgba(255,255,255,.18);
+ border: 1.5px solid rgba(255,255,255,.45);
+ border-radius: 50px;
+ color: #fff;
+ font-family: 'DM Sans', sans-serif;
+ font-size: .88rem; font-weight: 500;
+ padding: 13px 20px;
+ cursor: pointer;
+ transition: all .2s;
+ text-decoration: none;
+ -webkit-tap-highlight-color: transparent;
+ touch-action: manipulation;
+ letter-spacing: .03em;
+}
+.wa-btn:hover, .wa-btn:active {
+ background: rgba(255,255,255,.28);
+ border-color: rgba(255,255,255,.7);
+ transform: translateY(-1px);
+}
+.wa-icon { width: 22px; height: 22px; flex-shrink: 0; }
+
+/* ── FOOTER SPARKLE ──────────────────────────────────────────── */
+.footer-sparkle { text-align: center; padding: 28px 0 10px; }
+.footer-sparkle .dots { font-size: 16px; letter-spacing: 10px; color: var(--petal); }
+.footer-sparkle p { font-size: .7rem; color: var(--muted); letter-spacing: .12em; margin-top: 6px; text-transform: uppercase; }
+
+/* ── RESPONSIVE ──────────────────────────────────────────────── */
+@media (max-width: 420px) {
+ .card { padding: 22px 16px; }
+ .option-grid { grid-template-columns: 1fr 1fr; }
+ .total-num { font-size: 2.5rem; }
+ .hair-visual { grid-template-columns: 1fr 1fr; }
+}
+@media (min-width: 600px) {
+ .tabs-wrap { border-radius: 0 0 0 0; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ── HEADER ──────────────────────────────────────────── -->
+<header>
+ <span class="brand-bow">🎀</span>
+ <h1>MEMMAC <span>BEAUTY</span></h1>
+ <p class="tagline">Calculadora de precios · Servicios premium</p>
+ <div class="divider-bow"><span>✦</span></div>
+</header>
+
+</div><!-- /.wrap — closed so sticky tabs can span full width -->
+
+<!-- ── TABS (sticky) ──────────────────────────────────── -->
+<div class="tabs-wrap">
+ <div class="tabs" role="tablist">
+ <button class="tab-btn active" role="tab" data-section="gelish" onclick="showSection('gelish',this)">💅 Gelish con Rubber</button>
+ <button class="tab-btn" role="tab" data-section="softgel" onclick="showSection('softgel',this)">✨ Soft Gel</button>
+ <button class="tab-btn" role="tab" data-section="eventos" onclick="showSection('eventos',this)">🎀 Nails Bar Eventos</button>
+ <button class="tab-btn" role="tab" data-section="cabello" onclick="showSection('cabello',this)">💇‍♀️ Alaciado Japonés</button>
+ </div>
+</div>
+
+<div class="wrap">
+<div class="content">
+
+<!-- ═══════════════════════════════════════════════════════
+ GELISH CON RUBBER
+════════════════════════════════════════════════════════ -->
+<div id="section-gelish" class="section active">
+ <div class="card">
+ <div class="card-title">💅 Gelish con Rubber</div>
+ <p class="card-desc">Elige tus decoraciones por uña y la calculadora sumará todo automáticamente.</p>
+
+ <div class="includes">
+ <li>Preparación básica de la uña</li>
+ <li>Aplicación de Rubber base</li>
+ <li>1 o 2 tonos lisos a elegir</li>
+ <li>Acabado brillante profesional</li>
+ </div>
+
+ <div class="slabel">Precio base del servicio</div>
+ <div class="base-price">
+ <span class="base-price-num">$180</span>
+ <span class="base-price-cur">MXN</span>
+ </div>
+
+ <div class="slabel" style="margin-top:22px;">Decoraciones por uña</div>
+ <div class="deco-table">
+ <div class="deco-thead">
+ <div class="deco-th">Decoración</div>
+ <div class="deco-th" style="text-align:right;">Uñas</div>
+ </div>
+ <div class="deco-body" id="decos-gelish"></div>
+ </div>
+
+ <div class="slabel" style="margin-top:22px;">Servicios extra</div>
+ <div id="extras-gelish"></div>
+ </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+ SOFT GEL
+════════════════════════════════════════════════════════ -->
+<div id="section-softgel" class="section">
+ <div class="card">
+ <div class="card-title">✨ Soft Gel</div>
+ <p class="card-desc">Extensión profesional de gel suave. Selecciona el largo deseado y agrega tus decoraciones favoritas.</p>
+
+ <div class="includes">
+ <li>Extensión con Soft Gel de alta calidad</li>
+ <li>Color liso incluido</li>
+ <li>Todas las decoraciones y extras disponibles</li>
+ </div>
+
+ <div class="slabel">Largo</div>
+ <div class="option-grid" id="softgel-largo"></div>
+ <div id="softgel-cotiza" class="no-price-note" style="display:none;">✨ Extra largo requiere cotización personalizada. ¡Escríbenos!</div>
+
+ <div class="slabel" style="margin-top:22px;">Decoraciones por uña</div>
+ <div class="deco-table">
+ <div class="deco-thead">
+ <div class="deco-th">Decoración</div>
+ <div class="deco-th" style="text-align:right;">Uñas</div>
+ </div>
+ <div class="deco-body" id="decos-softgel"></div>
+ </div>
+
+ <div class="slabel" style="margin-top:22px;">Servicios extra</div>
+ <div id="extras-softgel"></div>
+ </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+ NAILS BAR EVENTOS
+════════════════════════════════════════════════════════ -->
+<div id="section-eventos" class="section">
+ <div class="card">
+ <div class="card-title">🎀 Nails Bar para Eventos</div>
+ <p class="card-desc">Experiencia premium de nail art para tu fiesta especial. Incluye traslado, montaje, materiales y atención personalizada para cada invitada.</p>
+
+ <div class="includes">
+ <li>Gelish con Rubber color liso para cada invitada</li>
+ <li>Muestrario de colores y diseños</li>
+ <li>Montaje completo de estación de trabajo</li>
+ <li>Materiales utilizados durante el evento</li>
+ <li>Atención personalizada para todas las invitadas</li>
+ </div>
+
+ <div class="slabel">Elige tu paquete</div>
+ <div class="event-cards">
+ <div class="ev-card" id="ev-mini" onclick="selectEvent('mini')">
+ <div class="ev-badge">🎀 Lanzamiento</div>
+ <div class="ev-name">Mini Party</div>
+ <div class="ev-dur">2 horas · hasta 5 personas</div>
+ <div class="ev-price" id="ev-mini-price">$1,200</div>
+ <div class="ev-regular">Regular <s>$1,400</s></div>
+ </div>
+ <div class="ev-card" id="ev-glam" onclick="selectEvent('glam')">
+ <div class="ev-badge">💎 Lanzamiento</div>
+ <div class="ev-name">Glam Party</div>
+ <div class="ev-dur">3 horas · hasta 7–8 personas</div>
+ <div class="ev-price" id="ev-glam-price">$1,700</div>
+ <div class="ev-regular">Regular <s>$2,000</s></div>
+ </div>
+ </div>
+
+ <div class="slabel">Modalidad de precio</div>
+ <div class="price-mode">
+ <button class="pm-btn active" id="pm-launch"  onclick="setPriceMode('launch')">🚀 Precio lanzamiento</button>
+ <button class="pm-btn" id="pm-regular" onclick="setPriceMode('regular')">💫 Precio regular</button>
+ </div>
+
+ <div class="slabel">Horas adicionales</div>
+ <div class="hora-row">
+ <input type="number" id="extra-horas" min="0" max="5" value="0" oninput="calcAll()">
+ <span class="hora-label">hora(s) adicional(es) × $600 MXN c/u (promedio)</span>
+ </div>
+
+ <div class="slabel" style="margin-top:20px;">Efectos y diseños especiales por uña</div>
+ <div id="evento-extras-decos"></div>
+
+ <div class="info-note">🚗 Traslado fuera de Guadalupe: costo personalizado. Contáctanos para cotización.</div>
+ </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+ ALACIADO JAPONÉS
+════════════════════════════════════════════════════════ -->
+<div id="section-cabello" class="section">
+ <div class="card">
+ <div class="card-title">💇‍♀️ Alaciado Japonés</div>
+ <p class="card-desc">Alisado permanente de larga duración con técnica japonesa. Resultados lisos, brillantes y naturales desde la primera sesión.</p>
+
+ <div class="includes">
+ <li>Diagnóstico y preparación capilar</li>
+ <li>Aplicación de fórmula japonesa profesional</li>
+ <li>Sellado con plancha y neutralizante</li>
+ <li>Resultado liso permanente y brillante</li>
+ </div>
+
+ <div class="slabel">Paso 1 — Largo del cabello</div>
+ <div class="hair-visual" id="hair-largo-grid"></div>
+
+ <div id="hair-cantidad-wrap" style="display:none;">
+ <div class="slabel">Paso 2 — Cantidad de cabello</div>
+ <div class="cantidad-grid" id="hair-cantidad-grid"></div>
+ </div>
+
+ <div class="no-price-note" id="hair-cotiza-note" style="display:none;">
+ ✨ Para cabello muy largo o extremadamente abundante ofrecemos una <strong>cotización personalizada</strong>.<br>¡Escríbenos y con gusto te atendemos!
+ </div>
+ </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+ TOTAL
+════════════════════════════════════════════════════════ -->
+<div class="total-card">
+ <div class="total-top-label">Tu cotización · MEMMAC BEAUTY</div>
+ <div class="total-service-name" id="total-service">Selecciona un servicio arriba</div>
+ <div class="total-lines" id="total-lines"></div>
+ <div class="tdivider"></div>
+ <div class="total-amount">
+ <div class="total-left">
+ <div class="ttext">Total estimado</div>
+ <div class="tcur">MXN</div>
+ </div>
+ <div class="total-num" id="total-num">$0</div>
+ </div>
+ <div class="cotiza-badge" id="cotiza-msg" style="display:none;">
+ 🎀 Este servicio requiere cotización personalizada. ¡Escríbenos con gusto!
+ </div>
+ <a class="wa-btn" id="wa-btn" href="#" target="_blank" rel="noopener">
+ <svg class="wa-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+ <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+ </svg>
+ 💗 Agendar cita por WhatsApp
+ </a>
+</div>
+
+<div class="footer-sparkle">
+ <div class="dots">✦ ✦ ✦</div>
+ <p>MEMMAC BEAUTY · Guadalupe, NL</p>
+</div>
+
+</div><!-- /.content -->
+</div><!-- /.wrap -->
+
+<script>
+/* ════════════════════════════════════════════════════════════
+ DATA
+════════════════════════════════════════════════════════════ */
+const PHONE = '528128729172';
+
+const DECOS = [
+ { name:'Glitter', price:5 },
+ { name:'Espejo',  price:5 },
+ { name:'Aurora',  price:5 },
+ { name:'Perlado', price:5 },
+ { name:'Azúcar',  price:5 },
+ { name:'Blooming',  price:5 },
+ { name:'Ojo de gato', price:5 },
+ { name:'Francesa sencilla', price:5 },
+ { name:'Encapsulado', price:10 },
+ { name:'Naturaleza muerta', price:10 },
+ { name:'Diseño sencillo', price:10 },
+ { name:'Diseño elaborado',  price:15 },
+ { name:'Efecto carey',  price:15 },
+ { name:'Relieve', price:15 },
+ { name:'3D',  price:15 },
+ { name:'Dijes', price:15 },
+ { name:'Sticker', price:5 },
+ { name:'Cristales pequeños',  price:20 },
+ { name:'Cristales medianos',  price:30 },
+ { name:'Cristales grandes', price:40 },
+];
+
+const EXTRAS_NAILS = [
+ { id:'retiro', name:'Retiro de producto anterior', price:50 },
+ { id:'reparacion',name:'Reparación de una uña',  price:25 },
+ { id:'forma',  name:'Cambio de forma',  price:20 },
+];
+
+const SOFTGEL_LARGOS = [
+ { id:'corto',  name:'Corto', price:300, note:'longitud natural' },
+ { id:'mediano',  name:'Mediano', price:400, note:'aprox. 1 cm' },
+ { id:'largo',  name:'Largo', price:500, note:'aprox. 2 cm' },
+ { id:'extralargo',name:'Extra largo',price:null,note:'cotización' },
+];
+
+const EVENT_PRICES = {
+ mini: { launch:1200, regular:1400 },
+ glam: { launch:1700, regular:2000 },
+};
+
+const HAIR_DATA = [
+ {
+ id:'corto', icon:'💆‍♀️', name:'Cabello corto',
+ desc:'Por encima de los hombros',
+ precios:{ poco:{price:1200,label:'Fino o normal'}, abundante:{price:1500,label:'Grueso o abundante'} }
+ },
+ {
+ id:'hombros', icon:'💁‍♀️', name:'Altura de hombros',
+ desc:'Toca o roza los hombros',
+ precios:{ poco:{price:1500,label:'Fino o normal'}, abundante:{price:1800,label:'Grueso o abundante'} }
+ },
+ {
+ id:'debajo', icon:'🧖‍♀️', name:'Debajo de hombros',
+ desc:'Cae por debajo del hombro',
+ precios:{ poco:{price:1800,label:'Fino o normal'}, abundante:{price:2000,label:'Grueso o abundante'} }
+ },
+ {
+ id:'muylargo', icon:'👸', name:'Muy largo',
+ desc:'Más de la mitad de la espalda o extremadamente abundante',
+ precios:null
+ },
+];
+
+/* ════════════════════════════════════════════════════════════
+ STATE
+════════════════════════════════════════════════════════════ */
+const state = {
+ activeSection: 'gelish',
+ gelishDecos: {},
+ gelishExtras: {},
+ softgelLargo: null,
+ softgelDecos: {},
+ softgelExtras: {},
+ eventoDecos: {},
+ selectedEvent: null,
+ priceMode: 'launch',
+ hairLargo: null,
+ hairCantidad: null,
+};
+
+/* ════════════════════════════════════════════════════════════
+ BUILD UI
+════════════════════════════════════════════════════════════ */
+function buildDecos(bodyId, stateKey) {
+ const c = document.getElementById(bodyId);
+ c.innerHTML = '';
+ DECOS.forEach((d, i) => {
+ const n = state[stateKey][i] || 0;
+ const cell1 = document.createElement('div');
+ cell1.className = 'deco-cell';
+ cell1.innerHTML = `<span>${d.name}</span>`;
+
+ const cell2 = document.createElement('div');
+ cell2.className = 'deco-cell right';
+ cell2.innerHTML = `
+ <span class="dprice">$${d.price}</span>
+ <div class="nctr">
+ <button class="nbtn" onclick="changeNail('${stateKey}',${i},-1)" aria-label="Restar">−</button>
+ <span class="ncount" id="${stateKey}-c-${i}">${n}</span>
+ <button class="nbtn" onclick="changeNail('${stateKey}',${i},1)" aria-label="Sumar">+</button>
+ </div>`;
+ c.appendChild(cell1);
+ c.appendChild(cell2);
+ });
+}
+
+function buildExtras(containerId, stateKey) {
+ const c = document.getElementById(containerId);
+ c.innerHTML = '';
+ EXTRAS_NAILS.forEach(e => {
+ const uid = `tog-${stateKey}-${e.id}`;
+ c.innerHTML += `
+ <div class="extra-row">
+ <div>
+ <div class="extra-info">${e.name}</div>
+ <div class="extra-price-tag">+$${e.price} MXN</div>
+ </div>
+ <input type="checkbox" class="tog-check" id="${uid}" onchange="toggleExtra('${stateKey}','${e.id}',this.checked)">
+ <label class="tog-label" for="${uid}"></label>
+ </div>`;
+ });
+}
+
+function buildSoftgelLargos() {
+ const c = document.getElementById('softgel-largo');
+ c.innerHTML = '';
+ SOFTGEL_LARGOS.forEach(l => {
+ c.innerHTML += `
+ <div>
+ <input type="radio" class="opt-radio" name="sg-largo" id="sg-${l.id}" value="${l.id}" onchange="setSoftgelLargo('${l.id}')">
+ <label class="opt-label" for="sg-${l.id}">
+ <span class="opt-name">${l.name}</span>
+ <span class="opt-price">${l.price ? '$'+l.price+' MXN' : 'Cotización personalizada'}</span>
+ <span class="opt-note">${l.note}</span>
+ </label>
+ </div>`;
+ });
+}
+
+function buildEventoDecos() {
+ const c = document.getElementById('evento-extras-decos');
+ c.innerHTML = '';
+ DECOS.forEach((d, i) => {
+ const n = state.eventoDecos[i] || 0;
+ c.innerHTML += `
+ <div class="extra-row">
+ <div>
+ <div class="extra-info">${d.name}</div>
+ <div class="extra-price-tag">+$${d.price} por uña</div>
+ </div>
+ <div class="nctr">
+ <button class="nbtn" onclick="changeNail('eventoDecos',${i},-1)">−</button>
+ <span class="ncount" id="eventoDecos-c-${i}">${n}</span>
+ <button class="nbtn" onclick="changeNail('eventoDecos',${i},1)">+</button>
+ </div>
+ </div>`;
+ });
+}
+
+function buildHairSection() {
+ const grid = document.getElementById('hair-largo-grid');
+ grid.innerHTML = '';
+ HAIR_DATA.forEach(h => {
+ const sel = state.hairLargo === h.id ? 'selected' : '';
+ grid.innerHTML += `
+ <div class="hair-card ${sel}" onclick="selectHairLargo('${h.id}')">
+ <span class="hair-card-icon">${h.icon}</span>
+ <span class="hair-card-name">${h.name}</span>
+ <span class="hair-card-desc">${h.desc}</span>
+ </div>`;
+ });
+}
+
+function buildHairCantidad(hairId) {
+ const wrap = document.getElementById('hair-cantidad-wrap');
+ const grid = document.getElementById('hair-cantidad-grid');
+ const cotiza = document.getElementById('hair-cotiza-note');
+ const hd = HAIR_DATA.find(h => h.id === hairId);
+
+ if (!hd || !hd.precios) {
+ wrap.style.display = 'none';
+ cotiza.style.display = 'block';
+ return;
+ }
+ cotiza.style.display = 'none';
+ grid.innerHTML = '';
+
+ const opts = [
+ { key:'poco', icon:'🪶', name:'Fino / normal',  desc:'Cabello delgado o cantidad moderada', price: hd.precios.poco.price },
+ { key:'abundante', icon:'🌿', name:'Grueso / abundante', desc:'Mucho volumen o cabello muy grueso', price: hd.precios.abundante.price },
+ ];
+
+ opts.forEach(o => {
+ const sel = state.hairCantidad === o.key ? 'checked' : '';
+ grid.innerHTML += `
+ <div>
+ <input type="radio" class="cant-radio" name="hair-cant" id="cant-${o.key}" value="${o.key}" ${sel} onchange="selectHairCantidad('${o.key}')">
+ <label class="cant-label" for="cant-${o.key}">
+ <span class="cant-icon">${o.icon}</span>
+ <span class="cant-name">${o.name}</span>
+ <span class="cant-desc">${o.desc}</span>
+ <span class="cant-price">$${o.price.toLocaleString('es-MX')} MXN</span>
+ </label>
+ </div>`;
+ });
+
+ wrap.style.display = 'block';
+}
+
+/* ════════════════════════════════════════════════════════════
+ INTERACTIONS
+════════════════════════════════════════════════════════════ */
+function showSection(id, btn) {
+ state.activeSection = id;
+ document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+ document.getElementById('section-'+id).classList.add('active');
+ document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+ btn.classList.add('active');
+ calcAll();
+}
+
+function changeNail(stateKey, idx, delta) {
+ if (!state[stateKey]) state[stateKey] = {};
+ state[stateKey][idx] = Math.max(0, Math.min(10, (state[stateKey][idx]||0) + delta));
+ const el = document.getElementById(`${stateKey}-c-${idx}`);
+ if (el) el.textContent = state[stateKey][idx];
+ calcAll();
+}
+
+function toggleExtra(stateKey, id, val) {
+ state[stateKey][id] = val;
+ calcAll();
+}
+
+function setSoftgelLargo(id) {
+ state.softgelLargo = id;
+ const isCotiza = !SOFTGEL_LARGOS.find(l=>l.id===id)?.price;
+ document.getElementById('softgel-cotiza').style.display = isCotiza ? 'block' : 'none';
+ calcAll();
+}
+
+function selectEvent(id) {
+ state.selectedEvent = id;
+ document.querySelectorAll('.ev-card').forEach(c => c.classList.remove('selected'));
+ document.getElementById('ev-'+id).classList.add('selected');
+ calcAll();
+}
+
+function setPriceMode(mode) {
+ state.priceMode = mode;
+ document.getElementById('pm-launch').classList.toggle('active', mode==='launch');
+ document.getElementById('pm-regular').classList.toggle('active', mode==='regular');
+ calcAll();
+}
+
+function selectHairLargo(id) {
+ state.hairLargo = id;
+ state.hairCantidad = null;
+ buildHairSection();
+ buildHairCantidad(id);
+ calcAll();
+}
+
+function selectHairCantidad(key) {
+ state.hairCantidad = key;
+ calcAll();
+}
+
+/* ════════════════════════════════════════════════════════════
+ CALC + WHATSAPP
+════════════════════════════════════════════════════════════ */
+function calcAll() {
+ const s = state.activeSection;
+ let total = 0, service = '', lines = [], cotiza = false;
+ let waLines = []; // for whatsapp message
+
+ /* ── GELISH ── */
+ if (s === 'gelish') {
+ service = 'Gelish con Rubber';
+ total = 180;
+ lines.push({l:'Base Gelish con Rubber', v:'$180'});
+ waLines.push('💅 *Servicio:* Gelish con Rubber');
+ waLines.push('✦ Base: $180 MXN');
+
+ const decoLines = [];
+ DECOS.forEach((d, i) => {
+ const n = state.gelishDecos[i] || 0;
+ if (n > 0) {
+ const sub = d.price * n;
+ total += sub;
+ lines.push({l:`${d.name} (${n} uña${n>1?'s':''})`, v:'$'+sub});
+ decoLines.push(` • ${d.name}: ${n} uña${n>1?'s':''} (+$${sub})`);
+ }
+ });
+ if (decoLines.length) { waLines.push('\n✨ *Decoraciones:*'); waLines.push(...decoLines); }
+
+ const extraLines = [];
+ EXTRAS_NAILS.forEach(e => {
+ if (state.gelishExtras[e.id]) {
+ total += e.price;
+ lines.push({l:e.name, v:'$'+e.price});
+ extraLines.push(` • ${e.name} (+$${e.price})`);
+ }
+ });
+ if (extraLines.length) { waLines.push('\n🎀 *Extras:*'); waLines.push(...extraLines); }
+ }
+
+ /* ── SOFT GEL ── */
+ else if (s === 'softgel') {
+ service = 'Soft Gel';
+ const largoObj = SOFTGEL_LARGOS.find(l => l.id === state.softgelLargo);
+ waLines.push('✨ *Servicio:* Soft Gel');
+
+ if (!largoObj) {
+ service = 'Soft Gel — elige largo';
+ } else if (!largoObj.price) {
+ service = 'Soft Gel Extra Largo';
+ cotiza = true;
+ waLines.push('📏 *Largo:* Extra largo (cotización personalizada)');
+ } else {
+ total = largoObj.price;
+ service = `Soft Gel · ${largoObj.name}`;
+ lines.push({l:`Largo ${largoObj.name}`, v:'$'+largoObj.price});
+ waLines.push(`📏 *Largo:* ${largoObj.name} — $${largoObj.price} MXN`);
+
+ const decoLines = [];
+ DECOS.forEach((d, i) => {
+ const n = state.softgelDecos[i] || 0;
+ if (n > 0) {
+ const sub = d.price * n;
+ total += sub;
+ lines.push({l:`${d.name} (${n} uña${n>1?'s':''})`, v:'$'+sub});
+ decoLines.push(` • ${d.name}: ${n} uña${n>1?'s':''} (+$${sub})`);
+ }
+ });
+ if (decoLines.length) { waLines.push('\n✨ *Decoraciones:*'); waLines.push(...decoLines); }
+
+ const extraLines = [];
+ EXTRAS_NAILS.forEach(e => {
+ if (state.softgelExtras[e.id]) {
+ total += e.price;
+ lines.push({l:e.name, v:'$'+e.price});
+ extraLines.push(` • ${e.name} (+$${e.price})`);
+ }
+ });
+ if (extraLines.length) { waLines.push('\n🎀 *Extras:*'); waLines.push(...extraLines); }
+ }
+ }
+
+ /* ── EVENTOS ── */
+ else if (s === 'eventos') {
+ service = 'Nails Bar Eventos';
+ waLines.push('🎀 *Servicio:* Nails Bar para Eventos');
+
+ if (!state.selectedEvent) {
+ service = 'Nails Bar — elige paquete';
+ } else {
+ const ep  = EVENT_PRICES[state.selectedEvent][state.priceMode];
+ const ename = state.selectedEvent === 'mini' ? 'MEMMAC Mini Party' : 'MEMMAC Glam Party';
+ const modeLabel = state.priceMode === 'launch' ? 'Precio lanzamiento' : 'Precio regular';
+ total = ep;
+ service = ename;
+ lines.push({l:`${ename} (${modeLabel})`, v:'$'+ep.toLocaleString('es-MX')});
+ waLines.push(`💗 *Paquete:* ${ename}`);
+ waLines.push(`💰 *Modalidad:* ${modeLabel} — $${ep.toLocaleString('es-MX')} MXN`);
+
+ const horas = parseInt(document.getElementById('extra-horas')?.value || 0);
+ if (horas > 0) {
+ const hc = horas * 600;
+ total += hc;
+ lines.push({l:`Hora${horas>1?'s':''} adicional${horas>1?'es':''} (${horas}h)`, v:'$'+hc});
+ waLines.push(`⏱ *Horas extra:* ${horas}h (+$${hc} MXN)`);
+ }
+
+ const decoLines = [];
+ DECOS.forEach((d, i) => {
+ const n = state.eventoDecos[i] || 0;
+ if (n > 0) {
+ const sub = d.price * n;
+ total += sub;
+ lines.push({l:`${d.name} (${n} uña${n>1?'s':''})`, v:'$'+sub});
+ decoLines.push(` • ${d.name}: ${n} uña${n>1?'s':''} (+$${sub})`);
+ }
+ });
+ if (decoLines.length) { waLines.push('\n✨ *Efectos especiales:*'); waLines.push(...decoLines); }
+ }
+ }
+
+ /* ── CABELLO ── */
+ else if (s === 'cabello') {
+ service = 'Alaciado Japonés';
+ waLines.push('💇‍♀️ *Servicio:* Alaciado Japonés');
+
+ const hd = HAIR_DATA.find(h => h.id === state.hairLargo);
+ if (!hd) {
+ service = 'Alaciado Japonés — elige largo';
+ } else if (!hd.precios) {
+ service = 'Alaciado Japonés · Muy largo';
+ cotiza = true;
+ waLines.push('📏 *Largo:* Muy largo / extremadamente abundante');
+ waLines.push('_(Requiere cotización personalizada)_');
+ } else if (state.hairCantidad && hd.precios[state.hairCantidad]) {
+ const pr = hd.precios[state.hairCantidad];
+ total = pr.price;
+ const cantLabel = state.hairCantidad === 'poco' ? 'Fino / normal' : 'Grueso / abundante';
+ service = `Alaciado Japonés · ${hd.name}`;
+ lines.push({l:`${hd.name} — ${cantLabel}`, v:'$'+total.toLocaleString('es-MX')});
+ waLines.push(`📏 *Largo:* ${hd.name}`);
+ waLines.push(`🪶 *Tipo de cabello:* ${cantLabel}`);
+ waLines.push(`💰 *Precio:* $${total.toLocaleString('es-MX')} MXN`);
+ } else {
+ service = `Alaciado Japonés · ${hd.name} — elige tipo de cabello`;
+ }
+ }
+
+ /* ── RENDER TOTAL ── */
+ document.getElementById('total-service').textContent = service;
+ const linesEl = document.getElementById('total-lines');
+ linesEl.innerHTML = lines.map(l =>
+ `<div class="tline"><span>${l.l}</span><span>${l.v}</span></div>`
+ ).join('');
+ document.getElementById('total-num').textContent = cotiza ? '—' : '$'+total.toLocaleString('es-MX');
+ document.getElementById('cotiza-msg').style.display = cotiza ? 'block' : 'none';
+
+ /* ── BUILD WHATSAPP MSG ── */
+ const waMsg = buildWAMessage(waLines, total, cotiza);
+ const waUrl = `https://wa.me/${528128729172}?text=${encodeURIComponent(waMsg)}`;
+ document.getElementById('wa-btn').href = waUrl;
+}
+
+function buildWAMessage(waLines, total, cotiza) {
+ let msg = 'Hola 💗 Me gustaría agendar una cita en MEMMAC BEAUTY.\n\n';
+ msg += 'Mi cotización es:\n\n';
+ msg += waLines.join('\n');
+ msg += '\n\n';
+ if (cotiza) {
+ msg += '💰 *Total:* Requiere cotización personalizada';
+ } else {
+ msg += `💰 *Total estimado: $${total.toLocaleString('es-MX')} MXN*`;
+ }
+ msg += '\n\n¡Quedo en espera de su respuesta! ✨';
+ return msg;
+}
+
+/* ════════════════════════════════════════════════════════════
+ INIT
+════════════════════════════════════════════════════════════ */
+buildDecos('decos-gelish', 'gelishDecos');
+buildExtras('extras-gelish', 'gelishExtras');
+buildDecos('decos-softgel', 'softgelDecos');
+buildExtras('extras-softgel', 'softgelExtras');
+buildSoftgelLargos();
+buildEventoDecos();
+buildHairSection();
+calcAll();
+</script>
+</body>
+</html>
